@@ -7,7 +7,7 @@ const ProfileImageUploader = ({ preview, onChange }) => {
     <div className="flex flex-col items-center justify-center mb-4">
       <div className="relative">
         <img
-          src={preview || '/src/assets/images/profile1.webp'}
+          src={preview || '/images/profile1.webp'}
           alt="Default Profile"
           className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-yellow-400"
         />
@@ -17,7 +17,7 @@ const ProfileImageUploader = ({ preview, onChange }) => {
           className="absolute bottom-0 right-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full border-yellow-400 flex items-center justify-center shadow-lg cursor-pointer hover:bg-gray-600 overflow-hidden"
         >
           <img
-            src="/src/assets/images/camera1.jpeg"
+            src="/images/camera1.jpeg"
             alt="Upload Icon"
             className="w-full h-full object-cover rounded-full"
           />
@@ -100,7 +100,7 @@ export const Signup = () => {
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-gradient-to-b bg-cover bg-center px-4 py-6"
-      style={{ backgroundImage: 'url(/src/assets/images/loginBG-3.jpg)' }}
+      style={{ backgroundImage: 'url(/images/loginBG-3.jpg)' }}
     >
       <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6 sm:p-8 w-full max-w-md">
         <h2 className="text-white text-xl sm:text-2xl font-bold text-center mb-4">

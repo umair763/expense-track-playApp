@@ -58,7 +58,7 @@ export const Signin = () => {
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-gradient-to-b bg-cover bg-center px-4 py-6"
-      style={{ backgroundImage: 'url(/src/assets/images/loginBG-2.jpg)' }}
+      style={{ backgroundImage: 'url(/images/loginBG-2.jpg)' }}
     >
       <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6 sm:p-8 w-full max-w-md">
         <h2 className="text-white text-xl sm:text-2xl font-bold text-center mb-6">
