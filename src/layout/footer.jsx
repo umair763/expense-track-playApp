@@ -1,5 +1,3 @@
-import React from 'react'
-import { Heart } from 'lucide-react'
 
 export const Footer = () => {
   return (
@@ -35,8 +33,7 @@ export const Footer = () => {
                items-center
                gap-1.5
             "
-        >
-        </div>
+        ></div>
       </div>
     </footer>
   )

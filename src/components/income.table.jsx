@@ -1,13 +1,23 @@
-import { Search, RefreshCw, Pencil, Trash2, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../common/use.auth.jsx'
 import { getIncome, deleteIncome } from '../firebase/firestore.service.js'
+import { UiPagination } from '../common/ui.pagination.jsx'
+import { UiSearch } from '../common/ui.search.jsx'
+import { ActionButtons } from '../common/action.buttons.jsx'
+import { UiLoading } from '../common/ui.loading.jsx'
+import { UiStatusPill } from '../common/ui.status.phill.jsx'
+import { UiDelete } from '../common/ui.delete.jsx'
+import { IncomeEditForm } from './income.edit.form.jsx'
 
 export const IncomeTable = () => {
   const { user } = useAuth()
   const [incomes, setIncomes] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [deleteModal, setDeleteModal] = useState({ open: false, item: null })
+  const [editModal, setEditModal] = useState({ open: false, item: null })
 
   useEffect(() => {
     fetchIncome()
@@ -44,17 +54,6 @@ export const IncomeTable = () => {
     setLoading(false)
   }
 
-  const handleDelete = async (incomeId) => {
-    if (!confirm('Are you sure you want to delete this income?')) return
-
-    const result = await deleteIncome(incomeId)
-    if (result.success) {
-      fetchIncome()
-    } else {
-      alert('Failed to delete income: ' + result.error)
-    }
-  }
-
   const filteredIncomes = incomes.filter(
     (income) =>
       income.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -62,9 +61,35 @@ export const IncomeTable = () => {
       income.source?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  // Pagination logic
+  const paginatedIncomes = filteredIncomes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
+  const handleDelete = async (incomeId) => {
+    const income = incomes.find((inc) => inc.id === incomeId)
+    setDeleteModal({ open: true, item: income })
+  }
+
+  const handleEdit = (income) => {
+    setEditModal({ open: true, item: income })
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteModal.item) return
+
+    const result = await deleteIncome(deleteModal.item.id)
+    if (result.success) {
+      fetchIncome()
+    } else {
+      alert('Failed to delete income: ' + result.error)
+    }
+    setDeleteModal({ open: false, item: null })
+  }
+
   return (
     <div className="w-full min-h-screen p-5 bg-white text-gray-900">
-
       {/* Header */}
 
       <div
@@ -92,47 +117,18 @@ export const IncomeTable = () => {
             Income Records
           </h1>
 
-          <p
-            className="
-                  text-gray-500
-                  mt-1
-               "
-          >
+          <p className="text-gray-500 mt-1">
             {loading ? 'Loading...' : `${filteredIncomes.length} records found`}
           </p>
         </div>
 
-        <div className="flex gap-3 w-full sm:w-auto">
-          <div className="relative flex-grow sm:w-64">
-            <input
-              placeholder="Search income..."
-              className="
-                        w-64
-                        pl-10
-                        pr-4
-                        py-2
-                        rounded-lg
-                        border
-                        border-gray-300
-                        bg-white
-                        outline-none
-                        focus:ring-2
-                        focus:ring-green-500
-                     "
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-
-            <Search
-              size={18}
-              className="
-                        absolute
-                        left-3
-                        top-3
-                        text-gray-400
-                     "
-            />
-          </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <UiSearch
+            placeholder="Search income..."
+            value={searchQuery}
+            onChange={setSearchQuery}
+            className="sm:w-64"
+          />
         </div>
       </div>
 
@@ -180,11 +176,8 @@ export const IncomeTable = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td
-                    colSpan="5"
-                    className="px-6 py-8 text-center text-gray-500"
-                  >
-                    Loading income records...
+                  <td colSpan="5" className="px-6 py-8">
+                    <UiLoading text="Loading income records..." />
                   </td>
                 </tr>
               ) : filteredIncomes.length === 0 ? (
@@ -197,7 +190,7 @@ export const IncomeTable = () => {
                   </td>
                 </tr>
               ) : (
-                filteredIncomes.map((income) => (
+                paginatedIncomes.map((income) => (
                   <tr
                     key={income.id}
                     className="
@@ -218,18 +211,10 @@ export const IncomeTable = () => {
                     </td>
 
                     <td className="px-6 py-4">
-                      <span
-                        className="
-                                 px-3
-                                 py-1
-                                 rounded-full
-                                 text-xs
-                                 bg-green-100
-                                 text-green-700
-                              "
-                      >
-                        {income.source?.name || 'Other'}
-                      </span>
+                      <UiStatusPill
+                        status={income.source?.name || 'Other'}
+                        color="#22C55E"
+                      />
                     </td>
 
                     <td
@@ -241,7 +226,7 @@ export const IncomeTable = () => {
                            "
                     >
                       {income.currency || 'PKR'}{' '}
-                      {income.amount?.toFixed(2) || '0.00'}
+                      {Number(income.amount)?.toFixed(2) || '0.00'}
                     </td>
 
                     <td
@@ -272,37 +257,14 @@ export const IncomeTable = () => {
                         : ''}
                     </td>
 
-                    <td className="px-6 py-4">
-                      <div
-                        className="
-                                 flex
-                                 justify-end
-                                 gap-2
-                              "
-                      >
-                        <button
-                          className="
-                                    p-2
-                                    rounded-lg
-                                    bg-green-100
-                                    text-green-600
-                                 "
-                        >
-                          <Pencil size={17} />
-                        </button>
-
-                        <button
-                          className="
-                                    p-2
-                                    rounded-lg
-                                    bg-red-100
-                                    text-red-600
-                                 "
-                          onClick={() => handleDelete(income.id)}
-                        >
-                          <Trash2 size={17} />
-                        </button>
-                      </div>
+                    <td className="px-6 py-4 text-right">
+                      <ActionButtons
+                        showView={false}
+                        showEdit={true}
+                        showDelete={true}
+                        onEdit={() => handleEdit(income)}
+                        onDelete={() => handleDelete(income.id)}
+                      />
                     </td>
                   </tr>
                 ))
@@ -313,52 +275,37 @@ export const IncomeTable = () => {
       </div>
 
       {/* Pagination */}
+      <UiPagination
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        totalItems={filteredIncomes.length}
+        itemLabel="income records"
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={setItemsPerPage}
+      />
 
-      <div
-        className="
-            mt-6
-            flex
-            justify-between
-            items-center
-         "
-      >
-        <p
-          className="
-               text-sm
-               text-gray-500
-            "
-        >
-          Showing {filteredIncomes.length > 0 ? 1 : 0} to{' '}
-          {filteredIncomes.length} of {filteredIncomes.length} entries
-        </p>
+      {/* Delete Modal */}
+      <UiDelete
+        open={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, item: null })}
+        onConfirm={confirmDelete}
+        title="Delete Income"
+        itemType="income"
+        itemName={deleteModal.item?.title}
+        message="Are you sure you want to delete this income record?"
+        confirmColor="#22C55E"
+      />
 
-        <div className="flex gap-2">
-          <button
-            className="
-                  px-4
-                  py-2
-                  rounded-lg
-                  bg-green-600
-                  text-white
-               "
-          >
-            1
-          </button>
-
-          <button
-            className="
-                  px-4
-                  py-2
-                  rounded-lg
-                  bg-white
-                  border border-gray-300
-                  text-gray-900
-               "
-          >
-            2
-          </button>
-        </div>
-      </div>
+      {/* Edit Modal */}
+      <IncomeEditForm
+        open={editModal.open}
+        onClose={() => setEditModal({ open: false, item: null })}
+        income={editModal.item}
+        onSuccess={() => {
+          fetchIncome()
+          window.dispatchEvent(new CustomEvent('incomeAdded'))
+        }}
+      />
     </div>
   )
 }

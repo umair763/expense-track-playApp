@@ -1,13 +1,23 @@
-import { Search, RefreshCw, Pencil, Trash2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../common/use.auth.jsx'
 import { getExpenses, deleteExpense } from '../firebase/firestore.service.js'
+import { UiPagination } from '../common/ui.pagination.jsx'
+import { UiSearch } from '../common/ui.search.jsx'
+import { ActionButtons } from '../common/action.buttons.jsx'
+import { UiLoading } from '../common/ui.loading.jsx'
+import { UiStatusPill } from '../common/ui.status.phill.jsx'
+import { UiDelete } from '../common/ui.delete.jsx'
+import { ExpenseEditForm } from './expense.edit.form.jsx'
 
 export const ExpensesTable = () => {
   const { user } = useAuth()
   const [expenses, setExpenses] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [deleteModal, setDeleteModal] = useState({ open: false, item: null })
+  const [editModal, setEditModal] = useState({ open: false, item: null })
 
   useEffect(() => {
     fetchExpenses()
@@ -41,20 +51,36 @@ export const ExpensesTable = () => {
   }
 
   const handleDelete = async (expenseId) => {
-    if (!confirm('Are you sure you want to delete this expense?')) return
-    
-    const result = await deleteExpense(expenseId)
+    const expense = expenses.find((exp) => exp.id === expenseId)
+    setDeleteModal({ open: true, item: expense })
+  }
+
+  const handleEdit = (expense) => {
+    setEditModal({ open: true, item: expense })
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteModal.item) return
+
+    const result = await deleteExpense(deleteModal.item.id)
     if (result.success) {
       fetchExpenses()
     } else {
       alert('Failed to delete expense: ' + result.error)
     }
+    setDeleteModal({ open: false, item: null })
   }
 
   const filteredExpenses = expenses.filter(expense =>
     expense.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     expense.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  // Pagination logic
+  const paginatedExpenses = filteredExpenses.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   )
 
   return (
@@ -72,20 +98,12 @@ export const ExpensesTable = () => {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-grow sm:w-64">
-            <input
-              type="text"
-              placeholder="Search expenses..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-
-            <Search
-              className="absolute left-3 top-2.5 text-gray-400"
-              size={18}
-            />
-          </div>
+          <UiSearch
+            placeholder="Search expenses..."
+            value={searchQuery}
+            onChange={setSearchQuery}
+            className="sm:w-64"
+          />
         </div>
       </div>
 
@@ -121,8 +139,8 @@ export const ExpensesTable = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
-                    Loading expenses...
+                  <td colSpan="5" className="px-6 py-8">
+                    <UiLoading text="Loading expenses..." />
                   </td>
                 </tr>
               ) : filteredExpenses.length === 0 ? (
@@ -132,7 +150,7 @@ export const ExpensesTable = () => {
                   </td>
                 </tr>
               ) : (
-                filteredExpenses.map((expense) => (
+                paginatedExpenses.map((expense) => (
                   <tr
                     key={expense.id}
                     className="hover:bg-blue-50 transition"
@@ -142,13 +160,14 @@ export const ExpensesTable = () => {
                     </td>
 
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
-                        {expense.category?.name || 'Other'}
-                      </span>
+                      <UiStatusPill
+                        status={expense.category?.name || 'Other'}
+                        color="#3B82F6"
+                      />
                     </td>
 
                     <td className="px-6 py-4 font-semibold">
-                      {expense.currency || 'PKR'} {expense.amount?.toFixed(2) || '0.00'}
+                      {expense.currency || 'PKR'} {Number(expense.amount)?.toFixed(2) || '0.00'}
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-500">
@@ -156,18 +175,13 @@ export const ExpensesTable = () => {
                     </td>
 
                     <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                          <Pencil size={18} />
-                        </button>
-
-                        <button 
-                          className="p-2 rounded-lg bg-red-50 text-red-600"
-                          onClick={() => handleDelete(expense.id)}
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                      <ActionButtons
+                        showView={false}
+                        showEdit={true}
+                        showDelete={true}
+                        onEdit={() => handleEdit(expense)}
+                        onDelete={() => handleDelete(expense.id)}
+                      />
                     </td>
                   </tr>
                 ))
@@ -177,27 +191,38 @@ export const ExpensesTable = () => {
         </div>
       </div>
 
-      {/* Pagination UI */}
+      {/* Pagination */}
+      <UiPagination
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        totalItems={filteredExpenses.length}
+        itemLabel="expense records"
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={setItemsPerPage}
+      />
 
-      <div className="mt-6 flex justify-between items-center">
-        <p className="text-sm text-gray-600">
-          Showing {filteredExpenses.length > 0 ? 1 : 0} to {filteredExpenses.length} of {filteredExpenses.length} entries
-        </p>
+      {/* Delete Modal */}
+      <UiDelete
+        open={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, item: null })}
+        onConfirm={confirmDelete}
+        title="Delete Expense"
+        itemType="expense"
+        itemName={deleteModal.item?.title}
+        message="Are you sure you want to delete this expense record?"
+        confirmColor="#3B82F6"
+      />
 
-        <div className="flex gap-2">
-          <button className="px-3 py-2 rounded bg-white border border-gray-300">
-            Previous
-          </button>
-
-          <button className="px-4 py-2 rounded bg-blue-600 text-white">
-            1
-          </button>
-
-          <button className="px-3 py-2 rounded bg-white border border-gray-300">
-            Next
-          </button>
-        </div>
-      </div>
+      {/* Edit Modal */}
+      <ExpenseEditForm
+        open={editModal.open}
+        onClose={() => setEditModal({ open: false, item: null })}
+        expense={editModal.item}
+        onSuccess={() => {
+          fetchExpenses()
+          window.dispatchEvent(new CustomEvent('expenseAdded'))
+        }}
+      />
     </div>
   )
 }

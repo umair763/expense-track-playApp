@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../common/use.auth.jsx'
-import { createIncome } from '../firebase/firestore.service.js'
+import { updateIncome } from '../firebase/firestore.service.js'
 import { toast } from 'react-toastify'
 
 const categories = [
@@ -20,7 +20,7 @@ const categories = [
   'Others',
 ]
 
-export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
+export const IncomeEditForm = ({ open, onClose, income, onSuccess }) => {
   const { user } = useAuth()
   const [formData, setFormData] = useState({
     category: '',
@@ -33,10 +33,35 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
+  useEffect(() => {
+    if (income && open) {
+      setFormData({
+        category: income.source?.name || '',
+        amount: income.amount || '',
+        description: income.description || '',
+        incomeDate: income.incomeDate
+          ? new Date(
+              income.incomeDate.seconds ? income.incomeDate.seconds * 1000 : income.incomeDate
+            )
+              .toISOString()
+              .split('T')[0]
+          : new Date().toISOString().split('T')[0],
+        incomeTime: income.incomeDate
+          ? new Date(
+              income.incomeDate.seconds ? income.incomeDate.seconds * 1000 : income.incomeDate
+            )
+              .toTimeString()
+              .slice(0, 5)
+          : new Date().toTimeString().slice(0, 5),
+        paymentMethod: income.paymentMethod || 'bank',
+      })
+    }
+  }, [income, open])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!user) {
-      setErrors({ general: 'You must be logged in to add income' })
+      setErrors({ general: 'You must be logged in to edit income' })
       return
     }
 
@@ -65,16 +90,16 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
       incomeDate: new Date(`${formData.incomeDate}T${formData.incomeTime}`),
     }
 
-    const result = await createIncome(user.id, incomeData)
+    const result = await updateIncome(income.id, incomeData)
 
     setLoading(false)
 
     if (result.success) {
       onSuccess()
       onClose()
-      toast.success('Income added successfully!')
+      toast.success('Income updated successfully!')
     } else {
-      setErrors({ general: result.error || 'Failed to create income' })
+      setErrors({ general: result.error || 'Failed to update income' })
     }
   }
 
@@ -84,9 +109,9 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-[1050] p-4">
       <div className="bg-white rounded-xl overflow-hidden flex flex-col w-full max-w-[800px] max-h-[90vh] font-sans">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#22C55E] rounded-t-xl flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#4A02F9] rounded-t-xl flex-shrink-0">
           <h2 className="text-[15px] font-semibold text-white leading-[1.4] m-0">
-            Add Income
+            Edit Income
           </h2>
           <button
             type="button"
@@ -221,10 +246,10 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#22C55E] cursor-pointer transition-all hover:bg-[rgba(34,197,94,0.88)] disabled:opacity-70 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#4A02F9] cursor-pointer transition-all hover:bg-[#4A02F9]/90 disabled:opacity-70 disabled:cursor-not-allowed"
             disabled={loading}
           >
-            {loading ? 'Submitting...' : 'Submit'}
+            {loading ? 'Updating...' : 'Update'}
           </button>
         </div>
       </div>

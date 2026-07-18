@@ -83,7 +83,7 @@ export const IncomeCard = () => {
   }
 
   return (
-    <div className="bg-sky-200 shadow-lg rounded-xl p-5 flex flex-col w-full h-full">
+    <div className="bg-[#1D79A8] shadow-lg rounded-xl p-5 flex flex-col w-full h-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <span className="text-gray-700 font-medium">

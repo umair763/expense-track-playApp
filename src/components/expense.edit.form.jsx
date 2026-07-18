@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../common/use.auth.jsx'
-import { createExpense } from '../firebase/firestore.service.js'
+import { updateExpense } from '../firebase/firestore.service.js'
 import { toast } from 'react-toastify'
 
 const categories = {
@@ -49,7 +49,7 @@ const categories = {
   Taxes: ['Income Taxes', 'Property Taxes', 'Sales Tax'],
 }
 
-export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
+export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
   const { user } = useAuth()
   const [formData, setFormData] = useState({
     category: '',
@@ -61,10 +61,28 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
+  useEffect(() => {
+    if (expense && open) {
+      setFormData({
+        category: expense.category?.name || '',
+        item: expense.title || '',
+        amount: expense.amount || '',
+        expenseDate: expense.expenseDate
+          ? new Date(
+              expense.expenseDate.seconds ? expense.expenseDate.seconds * 1000 : expense.expenseDate
+            )
+              .toISOString()
+              .split('T')[0]
+          : new Date().toISOString().split('T')[0],
+        paymentMethod: expense.paymentMethod || 'cash',
+      })
+    }
+  }, [expense, open])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!user) {
-      setErrors({ general: 'You must be logged in to add expenses' })
+      setErrors({ general: 'You must be logged in to edit expense' })
       return
     }
 
@@ -94,16 +112,16 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
       expenseDate: new Date(formData.expenseDate),
     }
 
-    const result = await createExpense(user.id, expenseData)
+    const result = await updateExpense(expense.id, expenseData)
 
     setLoading(false)
 
     if (result.success) {
       onSuccess()
       onClose()
-      toast.success('Expense added successfully!')
+      toast.success('Expense updated successfully!')
     } else {
-      setErrors({ general: result.error || 'Failed to create expense' })
+      setErrors({ general: result.error || 'Failed to update expense' })
     }
   }
 
@@ -113,9 +131,9 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-[1050] p-4">
       <div className="bg-white rounded-xl overflow-hidden flex flex-col w-full max-w-[800px] max-h-[90vh] font-sans">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#3B82F6] rounded-t-xl flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#4A02F9] rounded-t-xl flex-shrink-0">
           <h2 className="text-[15px] font-semibold text-white leading-[1.4] m-0">
-            Add Expense
+            Edit Expense
           </h2>
           <button
             type="button"
@@ -247,10 +265,10 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#3B82F6] cursor-pointer transition-all hover:bg-[rgba(59,130,246,0.88)] disabled:opacity-70 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#4A02F9] cursor-pointer transition-all hover:bg-[#4A02F9]/90 disabled:opacity-70 disabled:cursor-not-allowed"
             disabled={loading}
           >
-            {loading ? 'Submitting...' : 'Submit'}
+            {loading ? 'Updating...' : 'Update'}
           </button>
         </div>
       </div>

@@ -52,14 +52,14 @@ export const Sidebar = () => {
       )}
 
       <aside
-        className={`fixed lg:static z-50 top-0 left-0 h-full ${sidebarWidth} bg-white shadow-lg flex flex-col border-r border-gray-200 transition-all duration-300 ease-in-out ${desktopTranslate} ${mobileTranslate}`}
+        className={`fixed lg:static z-50 top-0 left-0 h-full ${sidebarWidth} bg-[#000C1D] text-white shadow-lg flex flex-col border-r border-gray-200 transition-all duration-300 ease-in-out ${desktopTranslate} ${mobileTranslate}`}
         aria-label="Sidebar navigation"
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <span
-            className={`font-bold text-lg text-purple-600 ${labelHidden} transition-all`}
+            className={`font-bold text-lg text-white ${labelHidden} transition-all`}
           >
-            💰 Expense Track
+            Expense Track
           </span>
           <div className="flex items-center gap-1">
             <button
@@ -82,7 +82,7 @@ export const Sidebar = () => {
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-3">
           {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
@@ -91,8 +91,8 @@ export const Sidebar = () => {
               className={({ isActive }) =>
                 `${linkBase} ${
                   isActive
-                    ? 'bg-purple-600 text-white shadow'
-                    : 'text-gray-700 hover:bg-purple-50'
+                    ? 'bg-[#4A02F9] text-white shadow'
+                    : 'text-white hover:bg-gray-500/50'
                 }`
               }
               title={collapsed ? label : undefined}
@@ -111,7 +111,7 @@ export const Sidebar = () => {
           <button
             type="button"
             onClick={signout}
-            className={`${linkBase} w-full text-red-600 hover:bg-red-50`}
+            className={`${linkBase} w-full text-red-600 hover:bg-red-100 cursor-pointer`}
             title={collapsed ? 'Sign out' : undefined}
           >
             <LogOut size={20} className="shrink-0" />
