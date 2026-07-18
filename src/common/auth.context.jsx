@@ -8,7 +8,7 @@ import {
   signInWithPopup 
 } from 'firebase/auth'
 import { auth } from '../firebase/firebase.js'
-import { createUserProfile, getUserProfile, updateUserLastSeen } from '../firebase/firestore.service.js'
+import { createUserProfile, getUserProfile, updateUserLastSeen, updateUserProfile } from '../firebase/firestore.service.js'
 
 export const AuthContext = createContext(null)
 
@@ -245,6 +245,13 @@ export const AuthProvider = ({ children }) => {
     if (!user) return { success: false, error: 'No user logged in' }
     
     try {
+      // Update Firestore
+      const firestoreResult = await updateUserProfile(user.id, patch)
+      if (!firestoreResult.success) {
+        return { success: false, error: firestoreResult.error }
+      }
+
+      // Update local state
       setUser((prev) => (prev ? { ...prev, ...patch } : prev))
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...user, ...patch }))
       return { success: true }

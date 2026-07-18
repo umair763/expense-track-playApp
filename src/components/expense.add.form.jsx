@@ -20,6 +20,20 @@ const categories = {
     'Vehicle Maintenance and Repairs',
     'Parking Fees',
   ],
+  Work: [
+  'Mobile Data Plan',
+  'Internet for Work',
+  'Software Subscriptions',
+  'Cloud Services',
+  'Domain and Hosting',
+  'Developer Tools',
+  'AI Tools',
+  'Online Courses',
+  'Books and Learning Materials',
+  'Certifications',
+  'Technical Communities',
+  'Professional Memberships',
+ ],
   Food: ['Groceries', 'Dining Out'],
   Healthcare: [
     'Health Insurance Premiums',
@@ -113,7 +127,7 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-[1050] p-4">
       <div className="bg-white rounded-xl overflow-hidden flex flex-col w-full max-w-[800px] max-h-[90vh] font-sans">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#3B82F6] rounded-t-xl flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#4A02F9] rounded-t-xl flex-shrink-0">
           <h2 className="text-[15px] font-semibold text-white leading-[1.4] m-0">
             Add Expense
           </h2>
@@ -222,6 +236,7 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
                     onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                   >
                     <option value="cash">Cash</option>
+                    <option value="online">Online</option>
                     <option value="bank">Bank Transfer</option>
                     <option value="card">Credit/Debit Card</option>
                   </select>
@@ -247,7 +262,7 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#3B82F6] cursor-pointer transition-all hover:bg-[rgba(59,130,246,0.88)] disabled:opacity-70 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#4A02F9] cursor-pointer transition-all hover:bg-[#4A02F9]/90 disabled:opacity-70 disabled:cursor-not-allowed"
             disabled={loading}
           >
             {loading ? 'Submitting...' : 'Submit'}

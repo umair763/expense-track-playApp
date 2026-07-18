@@ -88,13 +88,9 @@ export const ExpensesTable = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-500 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl text-[#4A02F9] font-bold">
             Expense Records
           </h1>
-
-          <p className="text-gray-600 text-sm mt-1">
-            {loading ? 'Loading...' : `${filteredExpenses.length} records found`}
-          </p>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -123,6 +119,10 @@ export const ExpensesTable = () => {
                 </th>
 
                 <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  Payment Method
+                </th>
+
+                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
                   Amount
                 </th>
 
@@ -139,52 +139,79 @@ export const ExpensesTable = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8">
+                  <td colSpan="6" className="px-6 py-8">
                     <UiLoading text="Loading expenses..." />
                   </td>
                 </tr>
               ) : filteredExpenses.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
                     No expenses found
                   </td>
                 </tr>
               ) : (
-                paginatedExpenses.map((expense) => (
-                  <tr
-                    key={expense.id}
-                    className="hover:bg-blue-50 transition"
-                  >
-                    <td className="px-6 py-4 text-sm font-medium">
-                      {expense.title}
-                    </td>
+                paginatedExpenses.map((expense) => {
+                  const paymentMethodColors = {
+                    cash: '#22C55E',
+                    online: '#EAB308',
+                    bank: '#3B82F6',
+                    card: '#A855F7',
+                  }
+                  
+                  const paymentMethodLabels = {
+                    cash: 'Cash',
+                    online: 'Online',
+                    bank: 'Bank Transfer',
+                    card: 'Credit/Debit Card',
+                  }
+                  
+                  const paymentMethod = expense.paymentMethod || 'cash'
+                  const color = paymentMethodColors[paymentMethod] || paymentMethodColors.cash
+                  const label = paymentMethodLabels[paymentMethod] || paymentMethod
 
-                    <td className="px-6 py-4">
-                      <UiStatusPill
-                        status={expense.category?.name || 'Other'}
-                        color="#3B82F6"
-                      />
-                    </td>
+                  return (
+                    <tr
+                      key={expense.id}
+                      className="hover:bg-blue-50 transition"
+                    >
+                      <td className="px-6 py-4 text-sm font-medium">
+                        {expense.title}
+                      </td>
 
-                    <td className="px-6 py-4 font-semibold">
-                      {expense.currency || 'PKR'} {Number(expense.amount)?.toFixed(2) || '0.00'}
-                    </td>
+                      <td className="px-6 py-4">
+                        <UiStatusPill
+                          status={expense.category?.name || 'Other'}
+                          color="#3B82F6"
+                        />
+                      </td>
 
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {expense.expenseDate ? new Date(expense.expenseDate.seconds ? expense.expenseDate.seconds * 1000 : expense.expenseDate).toLocaleDateString() : 'N/A'}
-                    </td>
+                      <td className="px-6 py-4">
+                        <UiStatusPill
+                          status={label}
+                          color={color}
+                        />
+                      </td>
 
-                    <td className="px-6 py-4 text-right">
-                      <ActionButtons
-                        showView={false}
-                        showEdit={true}
-                        showDelete={true}
-                        onEdit={() => handleEdit(expense)}
-                        onDelete={() => handleDelete(expense.id)}
-                      />
-                    </td>
-                  </tr>
-                ))
+                      <td className="px-6 py-4 font-semibold">
+                        {expense.currency || 'PKR'} {Number(expense.amount)?.toFixed(2) || '0.00'}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {expense.expenseDate ? new Date(expense.expenseDate.seconds ? expense.expenseDate.seconds * 1000 : expense.expenseDate).toLocaleDateString() : 'N/A'}
+                      </td>
+
+                      <td className="px-6 py-4 text-right">
+                        <ActionButtons
+                          showView={false}
+                          showEdit={true}
+                          showDelete={true}
+                          onEdit={() => handleEdit(expense)}
+                          onDelete={() => handleDelete(expense.id)}
+                        />
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>

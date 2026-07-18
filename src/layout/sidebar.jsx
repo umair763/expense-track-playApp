@@ -6,6 +6,7 @@ import {
   Menu,
   X,
   LogOut,
+  Settings,
 } from 'lucide-react'
 import { useSidebar } from '../common/sidebar.context'
 import { useAuth } from '../common'
@@ -24,7 +25,7 @@ export const Sidebar = () => {
     useSidebar()
   const { signout } = useAuth()
 
-  const sidebarWidth = collapsed ? 'w-20' : 'w-64'
+  const sidebarWidth = collapsed ? 'w-16' : 'w-64'
   const desktopTranslate = 'lg:translate-x-0'
   const mobileTranslate = isMobileOpen ? 'translate-x-0' : '-translate-x-full'
   const labelHidden = collapsed
@@ -65,7 +66,7 @@ export const Sidebar = () => {
             <button
               type="button"
               onClick={toggle}
-              className="hidden lg:inline-flex p-2 rounded-md hover:bg-gray-100"
+              className="hidden cursor-pointer lg:inline-flex p-2 rounded-md hover:bg-gray-500/50"
               aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               title={collapsed ? 'Expand' : 'Collapse'}
             >
@@ -107,14 +108,28 @@ export const Sidebar = () => {
           ))}
         </nav>
 
-        <div className="p-3 border-t border-gray-200">
+        <div className="space-y-2 p-3">
+          <NavLink
+            to="/settings"
+            onClick={closeMobile}
+            className={`${linkBase} text-white hover:bg-gray-500/50`}
+            title={collapsed ? 'Settings' : undefined}
+          >
+            <Settings size={20} className="shrink-0" />
+
+            <span className={`whitespace-nowrap transition-all ${labelHidden}`}>
+              Settings
+            </span>
+          </NavLink>
+          <div className="my-3 h-px w-full bg-gray-500/50" />
           <button
             type="button"
             onClick={signout}
-            className={`${linkBase} w-full text-red-600 hover:bg-red-100 cursor-pointer`}
+            className={`${linkBase} w-full cursor-pointer text-red-400 hover:bg-red-500/10 hover:text-red-300`}
             title={collapsed ? 'Sign out' : undefined}
           >
             <LogOut size={20} className="shrink-0" />
+
             <span className={`whitespace-nowrap transition-all ${labelHidden}`}>
               Sign out
             </span>

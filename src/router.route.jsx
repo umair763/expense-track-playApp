@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { MainLayout } from './layout'
-import { Signin, Signup, Dashboard, Expenses, Incomes } from './pages'
+import { Signin, Signup, Dashboard, Expenses, Incomes, Settings } from './pages'
 import { ProtectedRoute, PublicRoute } from './common/protected.route'
 
 export const router = createBrowserRouter([
@@ -35,6 +35,7 @@ export const router = createBrowserRouter([
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'expenses', element: <Expenses /> },
       { path: 'incomes', element: <Incomes /> },
+      { path: 'settings', element: <Settings /> },
     ],
   },
   {

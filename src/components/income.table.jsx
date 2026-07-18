@@ -107,19 +107,11 @@ export const IncomeTable = () => {
             className="
                   text-3xl
                   font-bold
-                  bg-gradient-to-r
-                  from-green-500
-                  to-teal-600
-                  bg-clip-text
-                  text-transparent
+                  text-[#4A02F9]
                "
           >
             Income Records
           </h1>
-
-          <p className="text-gray-500 mt-1">
-            {loading ? 'Loading...' : `${filteredIncomes.length} records found`}
-          </p>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -160,6 +152,10 @@ export const IncomeTable = () => {
                 </th>
 
                 <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  Payment Method
+                </th>
+
+                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
                   Amount
                 </th>
 
@@ -176,98 +172,114 @@ export const IncomeTable = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8">
+                  <td colSpan="6" className="px-6 py-8">
                     <UiLoading text="Loading income records..." />
                   </td>
                 </tr>
               ) : filteredIncomes.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="6"
                     className="px-6 py-8 text-center text-gray-500"
                   >
                     No income records found
                   </td>
                 </tr>
               ) : (
-                paginatedIncomes.map((income) => (
-                  <tr
-                    key={income.id}
-                    className="
-                              border-t
-                              border-gray-200
-                              hover:bg-green-50
-                           "
-                  >
-                    <td
+                paginatedIncomes.map((income) => {
+                  const paymentMethodColors = {
+                    cash: '#22C55E',
+                    online: '#EAB308',
+                    bank: '#3B82F6',
+                    card: '#A855F7',
+                  }
+                  
+                  const paymentMethodLabels = {
+                    cash: 'Cash',
+                    online: 'Online',
+                    bank: 'Bank Transfer',
+                    card: 'Credit/Debit Card',
+                  }
+                  
+                  const paymentMethod = income.paymentMethod || 'cash'
+                  const color = paymentMethodColors[paymentMethod] || paymentMethodColors.cash
+                  const label = paymentMethodLabels[paymentMethod] || paymentMethod
+
+                  return (
+                    <tr
+                      key={income.id}
                       className="
-                              px-6
-                              py-4
-                              font-medium
-                              text-gray-900
-                           "
+                                border-t
+                                border-gray-200
+                                hover:bg-green-50
+                             "
                     >
-                      {income.title}
-                    </td>
+                      <td
+                        className="
+                                px-6
+                                py-4
+                                font-medium
+                                text-gray-900
+                             "
+                      >
+                        {income.title}
+                      </td>
 
-                    <td className="px-6 py-4">
-                      <UiStatusPill
-                        status={income.source?.name || 'Other'}
-                        color="#22C55E"
-                      />
-                    </td>
+                      <td className="px-6 py-4">
+                        <UiStatusPill
+                          status={income.source?.name || 'Other'}
+                          color="#22C55E"
+                        />
+                      </td>
 
-                    <td
-                      className="
-                              px-6
-                              py-4
-                              font-semibold
-                              text-green-600
-                           "
-                    >
-                      {income.currency || 'PKR'}{' '}
-                      {Number(income.amount)?.toFixed(2) || '0.00'}
-                    </td>
+                      <td className="px-6 py-4">
+                        <UiStatusPill
+                          status={label}
+                          color={color}
+                        />
+                      </td>
 
-                    <td
-                      className="
-                              px-6
-                              py-4
-                              text-sm
-                              text-gray-600
-                           "
-                    >
-                      {income.incomeDate
-                        ? new Date(
-                            income.incomeDate.seconds
-                              ? income.incomeDate.seconds * 1000
-                              : income.incomeDate
-                          ).toLocaleDateString()
-                        : 'N/A'}
-                      <br />
-                      {income.incomeDate
-                        ? new Date(
-                            income.incomeDate.seconds
-                              ? income.incomeDate.seconds * 1000
-                              : income.incomeDate
-                          ).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : ''}
-                    </td>
+                      <td
+                        className="
+                                px-6
+                                py-4
+                                font-semibold
+                                text-green-600
+                             "
+                      >
+                        {income.currency || 'PKR'}{' '}
+                        {Number(income.amount)?.toFixed(2) || '0.00'}
+                      </td>
 
-                    <td className="px-6 py-4 text-right">
-                      <ActionButtons
-                        showView={false}
-                        showEdit={true}
-                        showDelete={true}
-                        onEdit={() => handleEdit(income)}
-                        onDelete={() => handleDelete(income.id)}
-                      />
-                    </td>
-                  </tr>
-                ))
+                      <td
+                        className="
+                                px-6
+                                py-4
+                                text-sm
+                                text-gray-600
+                             "
+                      >
+                        {income.incomeDate
+                          ? new Date(
+                              income.incomeDate.seconds
+                                ? income.incomeDate.seconds * 1000
+                                : income.incomeDate
+                            ).toLocaleDateString()
+                          : 'N/A'}
+                      </td>
+
+                      <td className="px-6 py-4 text-right">
+                        <ActionButtons
+                          showView={false}
+                          showEdit={true}
+                          showDelete={true}
+                          onEdit={() => handleEdit(income)}
+                          onDelete={() => handleDelete(income.id)}
+                        />
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>

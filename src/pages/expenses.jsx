@@ -15,7 +15,7 @@ export const Expenses = () => {
       <button
         type="button"
         onClick={() => setIsAddModalOpen(true)}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#3B82F6] hover:bg-[rgba(59,130,246,0.88)] text-white font-semibold shadow transition"
+        className="inline-flex items-center cursor-pointer gap-2 px-4 py-2 rounded-lg bg-[#4A02F9] hover:bg-[#4A02F9]/80 text-white font-semibold shadow transition"
       >
         Add Expense
       </button>

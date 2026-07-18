@@ -240,6 +240,7 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
                     onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                   >
                     <option value="cash">Cash</option>
+                    <option value="online">Online</option>
                     <option value="bank">Bank Transfer</option>
                     <option value="card">Credit/Debit Card</option>
                   </select>

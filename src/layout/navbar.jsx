@@ -1,10 +1,9 @@
-import { User as UserIcon } from 'lucide-react'
 import { useAuth } from '../common'
 
 export const Navbar = () => {
   const { user } = useAuth()
-  const initials = user?.name
-    ? user.name
+  const initials = user?.userName
+    ? user.userName
         .split(' ')
         .map((p) => p[0])
         .join('')
@@ -18,14 +17,14 @@ export const Navbar = () => {
         <div className="flex items-center gap-3">
           <div className="hidden sm:block leading-tight">
             <p className="text-sm font-semibold text-gray-900">
-              {user?.name || 'Guest'}
+              {user?.userName || 'Guest'}
             </p>
           </div>
 
-          {user?.avatar ? (
+          {user?.photoURL ? (
             <img
-              src={user.avatar}
-              alt={user.name}
+              src={user.photoURL}
+              alt={user.userName}
               className="h-9 w-9 rounded-xl border-2 border-purple-500 object-cover"
             />
           ) : (
