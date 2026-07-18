@@ -12,6 +12,7 @@ import {
   orderBy,
   serverTimestamp,
   Timestamp,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from './firebase.js';
 
@@ -19,6 +20,49 @@ import { db } from './firebase.js';
 const USERS_COLLECTION = 'users';
 const EXPENSES_COLLECTION = 'expenses';
 const INCOME_COLLECTION = 'income';
+const COUNTERS_COLLECTION = 'counters';
+
+// ==================== COUNTER OPERATIONS ====================
+
+const getCounterRef = (userId, counterType) => {
+  return doc(db, COUNTERS_COLLECTION, `${userId}_${counterType}`);
+};
+
+const getNextSequenceNumber = async (userId, counterType) => {
+  const counterRef = getCounterRef(userId, counterType);
+  
+  try {
+    const result = await runTransaction(db, async (transaction) => {
+      const counterDoc = await transaction.get(counterRef);
+      
+      let newCount;
+      
+      if (!counterDoc.exists()) {
+        // Create counter document if it doesn't exist
+        newCount = 1;
+        transaction.set(counterRef, {
+          count: newCount,
+          lastUpdated: serverTimestamp(),
+        });
+      } else {
+        // Increment existing counter
+        const currentCount = counterDoc.data().count;
+        newCount = currentCount + 1;
+        transaction.update(counterRef, {
+          count: newCount,
+          lastUpdated: serverTimestamp(),
+        });
+      }
+      
+      return newCount;
+    });
+    
+    return result;
+  } catch (error) {
+    console.error('Error getting next sequence number:', error);
+    throw error;
+  }
+};
 
 // ==================== USER OPERATIONS ====================
 
@@ -104,8 +148,12 @@ export const updateUserLastSeen = async (userId) => {
 
 export const createExpense = async (userId, expenseData) => {
   try {
+    // Get next sequence number (transaction handles counter creation if needed)
+    const sequenceNumber = await getNextSequenceNumber(userId, 'expense');
+    
     const expenseRef = await addDoc(collection(db, EXPENSES_COLLECTION), {
       id: '', // Will be set by document ID
+      sequenceNumber: sequenceNumber,
       title: expenseData.title,
       description: expenseData.description || '',
       amount: parseFloat(expenseData.amount),
@@ -122,7 +170,7 @@ export const createExpense = async (userId, expenseData) => {
     // Update the document with its own ID
     await updateDoc(expenseRef, { id: expenseRef.id });
 
-    return { success: true, id: expenseRef.id };
+    return { success: true, id: expenseRef.id, sequenceNumber };
   } catch (error) {
     console.error('Error creating expense:', error);
     return { success: false, error: error.message };
@@ -143,11 +191,11 @@ export const getExpenses = async (userId) => {
       expenses.push({ ...doc.data(), id: doc.id });
     });
 
-    // Sort client-side by expenseDate descending
+    // Sort client-side by sequenceNumber descending (newest first)
     expenses.sort((a, b) => {
-      const dateA = a.expenseDate?.seconds ? a.expenseDate.seconds * 1000 : new Date(a.expenseDate).getTime();
-      const dateB = b.expenseDate?.seconds ? b.expenseDate.seconds * 1000 : new Date(b.expenseDate).getTime();
-      return dateB - dateA;
+      const seqA = a.sequenceNumber || 0;
+      const seqB = b.sequenceNumber || 0;
+      return seqB - seqA;
     });
 
     return { success: true, data: expenses };
@@ -204,8 +252,12 @@ export const deleteExpense = async (expenseId) => {
 
 export const createIncome = async (userId, incomeData) => {
   try {
+    // Get next sequence number (transaction handles counter creation if needed)
+    const sequenceNumber = await getNextSequenceNumber(userId, 'income');
+    
     const incomeRef = await addDoc(collection(db, INCOME_COLLECTION), {
       id: '', // Will be set by document ID
+      sequenceNumber: sequenceNumber,
       title: incomeData.title,
       description: incomeData.description || '',
       amount: parseFloat(incomeData.amount),
@@ -222,7 +274,7 @@ export const createIncome = async (userId, incomeData) => {
     // Update the document with its own ID
     await updateDoc(incomeRef, { id: incomeRef.id });
 
-    return { success: true, id: incomeRef.id };
+    return { success: true, id: incomeRef.id, sequenceNumber };
   } catch (error) {
     console.error('Error creating income:', error);
     return { success: false, error: error.message };
@@ -243,11 +295,11 @@ export const getIncome = async (userId) => {
       incomeRecords.push({ ...doc.data(), id: doc.id });
     });
 
-    // Sort client-side by incomeDate descending
+    // Sort client-side by sequenceNumber descending (newest first)
     incomeRecords.sort((a, b) => {
-      const dateA = a.incomeDate?.seconds ? a.incomeDate.seconds * 1000 : new Date(a.incomeDate).getTime();
-      const dateB = b.incomeDate?.seconds ? b.incomeDate.seconds * 1000 : new Date(b.incomeDate).getTime();
-      return dateB - dateA;
+      const seqA = a.sequenceNumber || 0;
+      const seqB = b.sequenceNumber || 0;
+      return seqB - seqA;
     });
 
     return { success: true, data: incomeRecords };

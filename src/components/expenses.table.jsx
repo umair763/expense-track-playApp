@@ -111,6 +111,10 @@ export const ExpensesTable = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  #
+                </th>
+
+                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
                   Item
                 </th>
 
@@ -139,13 +143,13 @@ export const ExpensesTable = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8">
+                  <td colSpan="7" className="px-6 py-8">
                     <UiLoading text="Loading expenses..." />
                   </td>
                 </tr>
               ) : filteredExpenses.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
                     No expenses found
                   </td>
                 </tr>
@@ -174,6 +178,10 @@ export const ExpensesTable = () => {
                       key={expense.id}
                       className="hover:bg-blue-50 transition"
                     >
+                      <td className="px-6 py-4 text-sm text-gray-500 font-mono text-xs">
+                        {expense.sequenceNumber || expense.id}
+                      </td>
+
                       <td className="px-6 py-4 text-sm font-medium">
                         {expense.title}
                       </td>

@@ -144,6 +144,10 @@ export const IncomeTable = () => {
             >
               <tr>
                 <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
+                  #
+                </th>
+
+                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
                   Description
                 </th>
 
@@ -172,14 +176,14 @@ export const IncomeTable = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8">
+                  <td colSpan="7" className="px-6 py-8">
                     <UiLoading text="Loading income records..." />
                   </td>
                 </tr>
               ) : filteredIncomes.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="6"
+                    colSpan="7"
                     className="px-6 py-8 text-center text-gray-500"
                   >
                     No income records found
@@ -214,6 +218,19 @@ export const IncomeTable = () => {
                                 hover:bg-green-50
                              "
                     >
+                      <td
+                        className="
+                                px-6
+                                py-4
+                                text-sm
+                                text-gray-500
+                                font-mono
+                                text-xs
+                             "
+                      >
+                        {income.sequenceNumber || income.id}
+                      </td>
+
                       <td
                         className="
                                 px-6
