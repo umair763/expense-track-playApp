@@ -104,8 +104,8 @@ export const Signup = () => {
       <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
 
       {/* Signup Card */}
-      <div className="relative w-full max-w-md rounded-3xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl p-8">
-        <div className="text-center mb-6">
+      <div className="relative w-full max-w-md rounded-3xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl p-6">
+        <div className="text-center mb-4">
           <h1 className="text-3xl font-bold text-white">Create Account</h1>
           <p className="text-white/70 mt-2">Sign up to get started</p>
         </div>
@@ -167,7 +167,7 @@ export const Signup = () => {
           </button>
         </form>
 
-        <div className="my-6 flex items-center">
+        <div className="my-4 flex items-center">
           <div className="h-px flex-1 bg-white/20"></div>
 
           <span className="px-4 text-sm text-white/80">OR CONTINUE WITH</span>
@@ -202,7 +202,7 @@ export const Signup = () => {
           {submitting ? 'Creating account...' : 'Sign up with Google'}
         </button>
 
-        <p className="mt-8 text-center text-white/80">
+        <p className="mt-6 text-center text-white/80">
           Already have an account?{' '}
           <Link
             to="/signin"

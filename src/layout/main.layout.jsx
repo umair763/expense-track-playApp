@@ -1,23 +1,25 @@
-import { Outlet } from 'react-router-dom'
-import { Navbar, Sidebar, Footer } from '../layout'
-import { SidebarProvider } from '../common/sidebar.context'
+import { Outlet } from "react-router-dom";
+import { Navbar, Sidebar, Footer } from "../layout";
+import { SidebarProvider } from "../common/sidebar.context";
 
 export const MainLayout = () => {
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-[#4F30A9]/7">
         <Sidebar />
 
         <div className="flex flex-1 flex-col min-w-0">
           <Navbar />
 
-          <main className="flex-1 overflow-y-auto p-6">
-            <Outlet />
-          </main>
+          <div className="pt-16">
+            <main className="p-6">
+              <Outlet />
+            </main>
 
-          <Footer />
+            <Footer />
+          </div>
         </div>
       </div>
     </SidebarProvider>
-  )
-}
+  );
+};

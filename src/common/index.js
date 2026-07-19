@@ -10,3 +10,4 @@ export * from './ui.loading';
 export * from './ui.status.phill';
 export * from './ui.delete';
 export * from './action.menu';
+export * from './page.header';

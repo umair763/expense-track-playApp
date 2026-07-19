@@ -1,40 +1,19 @@
-
 export const Footer = () => {
   return (
-    <footer
-      className="
-         w-full
-         bg-white
-         border-t
-         border-gray-200
-         py-4
-      "
-    >
-      <div
-        className="
-            max-w-7xl
-            mx-auto
-            px-5
-            flex
-            flex-col
-            sm:flex-row
-            justify-between
-            items-center
-            gap-2
-            text-sm
-            text-gray-500
-         "
-      >
-        <p>© 2026 Finance Dashboard</p>
+    <footer className="w-full border-t border-gray-300">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 text-xs text-gray-500">
+        <p>
+          © 2026{" "}
+          <span className="font-medium text-[#4F30A9]">
+            Finance Dashboard
+          </span>
+          . All rights reserved.
+        </p>
 
-        <div
-          className="
-               flex
-               items-center
-               gap-1.5
-            "
-        ></div>
+        <p className="hidden sm:block">
+          v1.0.0
+        </p>
       </div>
     </footer>
-  )
-}
+  );
+};

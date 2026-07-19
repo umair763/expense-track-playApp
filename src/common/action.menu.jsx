@@ -66,7 +66,7 @@ export const ActionMenu = ({ actions = [], onAction }) => {
       <button
         ref={triggerRef}
         type="button"
-        aria-haspopup="true"
+        aria-haspopup="true"s
         aria-expanded={open}
         onClick={handleOpen}
         className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-700 transition hover:border-[#4F30A9] hover:text-[#4F30A9]"

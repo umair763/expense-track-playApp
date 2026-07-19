@@ -17,6 +17,7 @@ const categories = [
   'Commission',
   'Consulting',
   'Gifts',
+  'Pocket Money',
   'Others',
 ]
 
