@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../common'
 import { IncomeCard, ExpensePieChart, UiStates } from '../components'
 import { getExpenses, getIncome } from '../firebase/firestore.service.js'
@@ -11,26 +11,7 @@ export const Dashboard = () => {
   const [totalExpenses, setTotalExpenses] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchFinancialData()
-  }, [user])
-
-  useEffect(() => {
-    const handleExpenseAdded = () => {
-      fetchFinancialData()
-    }
-    const handleIncomeAdded = () => {
-      fetchFinancialData()
-    }
-    window.addEventListener('expenseAdded', handleExpenseAdded)
-    window.addEventListener('incomeAdded', handleIncomeAdded)
-    return () => {
-      window.removeEventListener('expenseAdded', handleExpenseAdded)
-      window.removeEventListener('incomeAdded', handleIncomeAdded)
-    }
-  }, [])
-
-  const fetchFinancialData = async () => {
+  const fetchFinancialData = useCallback(async () => {
     if (!user) {
       setLoading(false)
       return
@@ -61,7 +42,28 @@ export const Dashboard = () => {
     }
 
     setLoading(false)
-  }
+  }, [user])
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      void fetchFinancialData()
+    })
+  }, [fetchFinancialData])
+
+  useEffect(() => {
+    const handleExpenseAdded = () => {
+      fetchFinancialData()
+    }
+    const handleIncomeAdded = () => {
+      fetchFinancialData()
+    }
+    window.addEventListener('expenseAdded', handleExpenseAdded)
+    window.addEventListener('incomeAdded', handleIncomeAdded)
+    return () => {
+      window.removeEventListener('expenseAdded', handleExpenseAdded)
+      window.removeEventListener('incomeAdded', handleIncomeAdded)
+    }
+  }, [fetchFinancialData])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -75,7 +77,7 @@ export const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#4A02F9]">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#4F30A9]">
           Welcome back, {fullName}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -95,7 +97,6 @@ export const Dashboard = () => {
           value={loading ? 'Loading...' : formatCurrency(totalIncome)}
           icon={TrendingUp}
           trend="up"
-          trendValue="This Month"
           iconColor="text-green-600"
         />
         <UiStates
@@ -103,7 +104,6 @@ export const Dashboard = () => {
           value={loading ? 'Loading...' : formatCurrency(totalExpenses)}
           icon={TrendingDown}
           trend="down"
-          trendValue="This Month"
           iconColor="text-red-600"
         />
       </div>

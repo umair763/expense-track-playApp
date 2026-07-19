@@ -9,7 +9,7 @@ export const UiDelete = ({
   itemName,
   fallbackName = 'this item',
   message,
-  confirmLabel = 'Yes',
+  confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   confirmColor = '#5B21B6',
 }) => {

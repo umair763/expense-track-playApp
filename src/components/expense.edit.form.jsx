@@ -21,18 +21,18 @@ const categories = {
     'Parking Fees',
   ],
   Work: [
-  'Mobile Data Plan',
-  'Internet for Work',
-  'Software Subscriptions',
-  'Cloud Services',
-  'Domain and Hosting',
-  'Developer Tools',
-  'AI Tools',
-  'Online Courses',
-  'Books and Learning Materials',
-  'Certifications',
-  'Technical Communities',
-  'Professional Memberships',
+    'Mobile Data Plan',
+    'Internet for Work',
+    'Software Subscriptions',
+    'Cloud Services',
+    'Domain and Hosting',
+    'Developer Tools',
+    'AI Tools',
+    'Online Courses',
+    'Books and Learning Materials',
+    'Certifications',
+    'Technical Communities',
+    'Professional Memberships',
   ],
   Food: ['Groceries', 'Dining Out'],
   Healthcare: [
@@ -85,7 +85,9 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
         description: expense.description || '',
         expenseDate: expense.expenseDate
           ? new Date(
-              expense.expenseDate.seconds ? expense.expenseDate.seconds * 1000 : expense.expenseDate
+              expense.expenseDate.seconds
+                ? expense.expenseDate.seconds * 1000
+                : expense.expenseDate
             )
               .toISOString()
               .split('T')[0]
@@ -117,7 +119,8 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
 
     const expenseData = {
       title: formData.item,
-      description: formData.description || `${formData.category} - ${formData.item}`,
+      description:
+        formData.description || `${formData.category} - ${formData.item}`,
       amount: Number(formData.amount),
       currency: user.currency || 'PKR',
       category: {
@@ -147,7 +150,7 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
     <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-[1050] p-4">
       <div className="bg-white rounded-xl overflow-hidden flex flex-col w-full max-w-[800px] max-h-[90vh] font-sans">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#4A02F9] rounded-t-xl flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#4F30A9] rounded-t-xl flex-shrink-0">
           <h2 className="text-[15px] font-semibold text-white leading-[1.4] m-0">
             Edit Expense
           </h2>
@@ -156,9 +159,18 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
             onClick={onClose}
             className="inline-flex items-center justify-center w-7 h-7 p-0 border-none bg-transparent text-white/85 cursor-pointer rounded-lg transition-all hover:bg-white/15 hover:text-white focus-visible:outline-2 focus-visible:outline-white/70 focus-visible:outline-offset-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              width="14"
+              height="14"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
@@ -181,16 +193,26 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
                   <select
                     className="w-full min-h-[44px] px-[14px] text-sm font-sans text-[#2A3547] bg-white border border-[#E4E7EC] rounded-lg outline-none cursor-pointer transition-all focus:border-[#3B82F6] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%236B7280%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-9"
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value, item: '' })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        category: e.target.value,
+                        item: '',
+                      })
+                    }
                   >
                     <option value="">Select Category</option>
                     {Object.keys(categories).map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
                     ))}
                   </select>
                 </div>
                 {errors.category && (
-                  <span className="text-xs text-red-500 mt-[-4px]">{errors.category}</span>
+                  <span className="text-xs text-red-500 mt-[-4px]">
+                    {errors.category}
+                  </span>
                 )}
               </div>
 
@@ -202,17 +224,24 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
                   <select
                     className={`w-full min-h-[44px] px-[14px] text-sm font-sans text-[#2A3547] bg-white border rounded-lg outline-none cursor-pointer transition-all appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%236B7280%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-9 ${errors.item ? 'border-red-500' : 'border-[#E4E7EC] focus:border-[#3B82F6]'}`}
                     value={formData.item}
-                    onChange={(e) => setFormData({ ...formData, item: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, item: e.target.value })
+                    }
                     disabled={!formData.category}
                   >
                     <option value="">Select Item</option>
-                    {formData.category && categories[formData.category]?.map((item) => (
-                      <option key={item} value={item}>{item}</option>
-                    ))}
+                    {formData.category &&
+                      categories[formData.category]?.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 {errors.item && (
-                  <span className="text-xs text-red-500 mt-[-4px]">{errors.item}</span>
+                  <span className="text-xs text-red-500 mt-[-4px]">
+                    {errors.item}
+                  </span>
                 )}
               </div>
             </div>
@@ -226,10 +255,14 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
                 placeholder="Enter amount"
                 className={`w-full border rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#3B82F6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] ${errors.amount ? 'border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]' : 'border-[#e2e8f0]'}`}
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
               />
               {errors.amount && (
-                <span className="text-xs text-red-500 mt-[-4px]">{errors.amount}</span>
+                <span className="text-xs text-red-500 mt-[-4px]">
+                  {errors.amount}
+                </span>
               )}
             </div>
 
@@ -242,7 +275,9 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
                 rows="2"
                 className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#3B82F6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] resize-vertical min-h-[64px]"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
               />
             </div>
 
@@ -255,7 +290,9 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
                   type="date"
                   className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#3B82F6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
                   value={formData.expenseDate}
-                  onChange={(e) => setFormData({ ...formData, expenseDate: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, expenseDate: e.target.value })
+                  }
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -266,7 +303,12 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
                   <select
                     className="w-full min-h-[44px] px-[14px] text-sm font-sans text-[#2A3547] bg-white border border-[#E4E7EC] rounded-lg outline-none cursor-pointer transition-all focus:border-[#3B82F6] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%236B7280%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-9"
                     value={formData.paymentMethod}
-                    onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        paymentMethod: e.target.value,
+                      })
+                    }
                   >
                     <option value="cash">Cash</option>
                     <option value="online">Online</option>
@@ -295,7 +337,7 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#4A02F9] cursor-pointer transition-all hover:bg-[#4A02F9]/90 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#4F30A9] cursor-pointer transition-all hover:bg-[#4F30A9]/90 disabled:opacity-70 disabled:cursor-not-allowed"
             disabled={loading}
           >
             {loading ? 'Updating...' : 'Update'}

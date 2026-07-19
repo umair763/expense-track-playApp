@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from '../common/use.auth.jsx'
 import { getIncome, deleteIncome } from '../firebase/firestore.service.js'
 import { UiPagination } from '../common/ui.pagination.jsx'
 import { UiSearch } from '../common/ui.search.jsx'
-import { ActionButtons } from '../common/action.buttons.jsx'
+import { ActionMenu } from '../common/action.menu.jsx'
 import { UiLoading } from '../common/ui.loading.jsx'
 import { UiStatusPill } from '../common/ui.status.phill.jsx'
 import { UiDelete } from '../common/ui.delete.jsx'
@@ -11,8 +11,35 @@ import { IncomeEditForm } from './income.edit.form.jsx'
 
 export const IncomeTable = () => {
   const { user } = useAuth()
+
+  const PAYMENT_METHOD_COLORS = {
+    cash: '#22C55E',
+    online: '#EAB308',
+    bank: '#3B82F6',
+    card: '#A855F7',
+  }
+
+  const PAYMENT_METHOD_LABELS = {
+    cash: 'Cash',
+    online: 'Online',
+    bank: 'Bank Transfer',
+    card: 'Credit/Debit Card',
+  }
+
+  const ROW_ACTIONS = [
+    { key: 'edit', label: 'Edit', variant: 'filled' },
+    { key: 'delete', label: 'Delete', variant: 'danger' },
+  ]
+
+  const formatIncomeDate = (incomeDate) => {
+    if (!incomeDate) return 'N/A'
+    const ms = incomeDate.seconds ? incomeDate.seconds * 1000 : incomeDate
+    return new Date(ms).toLocaleDateString()
+  }
+
   const [incomes, setIncomes] = useState([])
   const [loading, setLoading] = useState(true)
+  const [refreshTick, setRefreshTick] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
@@ -20,160 +47,108 @@ export const IncomeTable = () => {
   const [editModal, setEditModal] = useState({ open: false, item: null })
 
   useEffect(() => {
-    fetchIncome()
-  }, [user])
+    let cancelled = false
+    const run = async () => {
+      if (!user?.id) {
+        setIncomes([])
+        setLoading(false)
+        return
+      }
+      setLoading(true)
+      const result = await getIncome(user.id)
+      if (cancelled) return
+      if (result.success) setIncomes(result.data)
+      else console.error('Failed to fetch income:', result.error)
+      setLoading(false)
+    }
+    run()
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id, refreshTick])
+
+  const refresh = useCallback(() => setRefreshTick((t) => t + 1), [])
 
   useEffect(() => {
-    const handleIncomeAdded = () => {
-      fetchIncome()
-    }
-    window.addEventListener('incomeAdded', handleIncomeAdded)
-    return () => window.removeEventListener('incomeAdded', handleIncomeAdded)
+    window.addEventListener('incomeAdded', refresh)
+    return () => window.removeEventListener('incomeAdded', refresh)
+  }, [refresh])
+
+  const handleSearchChange = useCallback((value) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
   }, [])
 
-  const fetchIncome = async () => {
-    if (!user) {
-      setIncomes([])
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    console.log('Fetching income for user ID:', user.id)
-    const result = await getIncome(user.id)
-
-    console.log('Fetch result:', result)
-
-    if (result.success) {
-      console.log('Income data fetched:', result.data)
-      setIncomes(result.data)
-    } else {
-      console.error('Failed to fetch income:', result.error)
-    }
-
-    setLoading(false)
-  }
-
-  const filteredIncomes = incomes.filter(
-    (income) =>
-      income.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      income.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      income.source?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  // Pagination logic
-  const paginatedIncomes = filteredIncomes.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
-
-  const handleDelete = async (incomeId) => {
-    const income = incomes.find((inc) => inc.id === incomeId)
-    setDeleteModal({ open: true, item: income })
-  }
-
-  const handleEdit = (income) => {
-    setEditModal({ open: true, item: income })
-  }
+  const handleEdit = (income) => setEditModal({ open: true, item: income })
+  const handleDelete = (income) => setDeleteModal({ open: true, item: income })
 
   const confirmDelete = async () => {
     if (!deleteModal.item) return
-
     const result = await deleteIncome(deleteModal.item.id)
-    if (result.success) {
-      fetchIncome()
-    } else {
-      alert('Failed to delete income: ' + result.error)
-    }
+    if (result.success) refresh()
+    else alert('Failed to delete income: ' + result.error)
     setDeleteModal({ open: false, item: null })
   }
+
+  const filteredIncomes = useMemo(() => {
+    const query = searchQuery.toLowerCase()
+    if (!query) return incomes
+    return incomes.filter(
+      (i) =>
+        i.title?.toLowerCase().includes(query) ||
+        i.description?.toLowerCase().includes(query) ||
+        i.source?.name?.toLowerCase().includes(query)
+    )
+  }, [incomes, searchQuery])
+
+  const paginatedIncomes = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage
+    return filteredIncomes.slice(start, start + itemsPerPage)
+  }, [filteredIncomes, currentPage, itemsPerPage])
 
   return (
     <div className="w-full min-h-screen p-5 bg-white text-gray-900">
       {/* Header */}
-
-      <div
-        className="
-            flex
-            flex-col
-            sm:flex-row
-            justify-between
-            gap-4
-            mb-6
-         "
-      >
-        <div>
-          <h1
-            className="
-                  text-3xl
-                  font-bold
-                  text-[#4A02F9]
-               "
-          >
-            Income Records
-          </h1>
-        </div>
-
+      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+        <h1 className="text-3xl font-bold text-[#4F30A9]">Income Records</h1>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <UiSearch
             placeholder="Search income..."
             value={searchQuery}
-            onChange={setSearchQuery}
+            onChange={handleSearchChange}
             className="sm:w-64"
           />
         </div>
       </div>
 
       {/* Table */}
-
-      <div
-        className="
-            rounded-xl
-            overflow-hidden
-            border
-            border-gray-200
-            bg-white/50
-         "
-      >
+      <div className="rounded-xl overflow-hidden border border-gray-200">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead
-              className="
-                     bg-gray-50
-                  "
-            >
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
-                  #
-                </th>
-
-                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
-                  Description
-                </th>
-
-                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
-                  Category
-                </th>
-
-                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
-                  Payment Method
-                </th>
-
-                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
-                  Amount
-                </th>
-
-                <th className="px-6 py-4 text-left text-xs uppercase text-gray-500">
-                  Date
-                </th>
-
-                <th className="px-6 py-4 text-right text-xs uppercase text-gray-500">
+                {[
+                  '#',
+                  'Description',
+                  'Category',
+                  'Payment Method',
+                  'Amount',
+                  'Date',
+                ].map((col) => (
+                  <th
+                    key={col}
+                    className="px-6 py-4 text-left text-xs uppercase text-gray-500"
+                  >
+                    {col}
+                  </th>
+                ))}
+                <th className="w-24 px-6 py-4 text-center text-xs uppercase text-gray-500">
                   Actions
                 </th>
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
                   <td colSpan="7" className="px-6 py-8">
@@ -191,54 +166,23 @@ export const IncomeTable = () => {
                 </tr>
               ) : (
                 paginatedIncomes.map((income) => {
-                  const paymentMethodColors = {
-                    cash: '#22C55E',
-                    online: '#EAB308',
-                    bank: '#3B82F6',
-                    card: '#A855F7',
-                  }
-                  
-                  const paymentMethodLabels = {
-                    cash: 'Cash',
-                    online: 'Online',
-                    bank: 'Bank Transfer',
-                    card: 'Credit/Debit Card',
-                  }
-                  
                   const paymentMethod = income.paymentMethod || 'cash'
-                  const color = paymentMethodColors[paymentMethod] || paymentMethodColors.cash
-                  const label = paymentMethodLabels[paymentMethod] || paymentMethod
+                  const color =
+                    PAYMENT_METHOD_COLORS[paymentMethod] ??
+                    PAYMENT_METHOD_COLORS.cash
+                  const label =
+                    PAYMENT_METHOD_LABELS[paymentMethod] ?? paymentMethod
 
                   return (
                     <tr
                       key={income.id}
-                      className="
-                                border-t
-                                border-gray-200
-                                hover:bg-green-50
-                             "
+                      className="hover:bg-green-50 transition"
                     >
-                      <td
-                        className="
-                                px-6
-                                py-4
-                                text-sm
-                                text-gray-500
-                                font-mono
-                                text-xs
-                             "
-                      >
+                      <td className="px-6 py-4 text-sm text-gray-500 font-mono text-xs">
                         {income.sequenceNumber || income.id}
                       </td>
 
-                      <td
-                        className="
-                                px-6
-                                py-4
-                                font-medium
-                                text-gray-900
-                             "
-                      >
+                      <td className="px-6 py-4 font-medium text-gray-900">
                         {income.title}
                       </td>
 
@@ -250,49 +194,28 @@ export const IncomeTable = () => {
                       </td>
 
                       <td className="px-6 py-4">
-                        <UiStatusPill
-                          status={label}
-                          color={color}
-                        />
+                        <UiStatusPill status={label} color={color} />
                       </td>
 
-                      <td
-                        className="
-                                px-6
-                                py-4
-                                font-semibold
-                                text-green-600
-                             "
-                      >
+                      <td className="px-6 py-4 font-semibold text-green-600">
                         {income.currency || 'PKR'}{' '}
                         {Number(income.amount)?.toFixed(2) || '0.00'}
                       </td>
 
-                      <td
-                        className="
-                                px-6
-                                py-4
-                                text-sm
-                                text-gray-600
-                             "
-                      >
-                        {income.incomeDate
-                          ? new Date(
-                              income.incomeDate.seconds
-                                ? income.incomeDate.seconds * 1000
-                                : income.incomeDate
-                            ).toLocaleDateString()
-                          : 'N/A'}
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {formatIncomeDate(income.incomeDate)}
                       </td>
 
-                      <td className="px-6 py-4 text-right">
-                        <ActionButtons
-                          showView={false}
-                          showEdit={true}
-                          showDelete={true}
-                          onEdit={() => handleEdit(income)}
-                          onDelete={() => handleDelete(income.id)}
-                        />
+                      <td className="w-24 px-6 py-4">
+                        <div className="flex w-full justify-center">
+                          <ActionMenu
+                            actions={ROW_ACTIONS}
+                            onAction={(actionKey) => {
+                              if (actionKey === 'edit') handleEdit(income)
+                              if (actionKey === 'delete') handleDelete(income)
+                            }}
+                          />
+                        </div>
                       </td>
                     </tr>
                   )
@@ -331,7 +254,7 @@ export const IncomeTable = () => {
         onClose={() => setEditModal({ open: false, item: null })}
         income={editModal.item}
         onSuccess={() => {
-          fetchIncome()
+          refresh()
           window.dispatchEvent(new CustomEvent('incomeAdded'))
         }}
       />

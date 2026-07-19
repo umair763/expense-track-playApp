@@ -84,7 +84,7 @@ export const UiPagination = ({
                 onClick={() => onPageChange(page)}
                 className={`flex h-9 min-w-[36px] items-center justify-center rounded-lg px-3 cursor-pointer text-sm font-medium transition ${
                   currentPage === page
-                    ? 'bg-[#4A02F9] text-white shadow'
+                    ? 'bg-[#4F30A9] text-white shadow'
                     : 'border border-gray-300 text-gray-700 hover:bg-gray-100'
                 }`}
               >

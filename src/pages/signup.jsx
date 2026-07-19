@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Eye, EyeOff, Camera } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../common'
 
@@ -9,18 +10,14 @@ const ProfileImageUploader = ({ preview, onChange }) => {
         <img
           src={preview || '/images/profile1.webp'}
           alt="Default Profile"
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-yellow-400"
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-white shadow-lg"
         />
 
         <label
           htmlFor="file-input"
-          className="absolute bottom-0 right-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full border-yellow-400 flex items-center justify-center shadow-lg cursor-pointer hover:bg-gray-600 overflow-hidden"
+          className="absolute bottom-0 right-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#4F30A9] border-2 border-white flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#3d01d2] transition"
         >
-          <img
-            src="/images/camera1.jpeg"
-            alt="Upload Icon"
-            className="w-full h-full object-cover rounded-full"
-          />
+          <Camera size={16} className="text-white" />
         </label>
 
         <input
@@ -28,7 +25,7 @@ const ProfileImageUploader = ({ preview, onChange }) => {
           id="file-input"
           accept="image/*"
           onChange={onChange}
-          className="hidden"
+          className="hidden cursor-pointer"
         />
       </div>
     </div>
@@ -42,6 +39,7 @@ export const Signup = () => {
   const [preview, setPreview] = useState(null)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
@@ -64,13 +62,13 @@ export const Signup = () => {
     setSubmitting(true)
 
     const result = await signup(form)
-    
+
     if (result.success) {
       navigate('/dashboard', { replace: true })
     } else {
       setError(result.error || 'Failed to create account')
     }
-    
+
     setSubmitting(false)
   }
 
@@ -79,13 +77,13 @@ export const Signup = () => {
     setSubmitting(true)
 
     const result = await signInWithGoogle()
-    
+
     if (result.success) {
       navigate('/dashboard', { replace: true })
     } else {
       setError(result.error || 'Failed to sign up with Google')
     }
-    
+
     setSubmitting(false)
   }
 
@@ -99,66 +97,90 @@ export const Signup = () => {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-b bg-cover bg-center px-4 py-6"
-      style={{ backgroundImage: 'url(/images/loginBG-3.jpg)' }}
+      className="min-h-screen flex items-center justify-center bg-cover bg-center relative px-4"
+      style={{ backgroundImage: "url('/images/loginBG-3.jpg')" }}
     >
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6 sm:p-8 w-full max-w-md">
-        <h2 className="text-white text-xl sm:text-2xl font-bold text-center mb-4">
-          Registration
-        </h2>
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
+
+      {/* Signup Card */}
+      <div className="relative w-full max-w-md rounded-3xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl p-8">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-white">Create Account</h1>
+          <p className="text-white/70 mt-2">Sign up to get started</p>
+        </div>
 
         <ProfileImageUploader preview={preview} onChange={handleImage} />
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Name"
-            value={form.name}
-            onChange={handleChange('name')}
-            className="w-full py-2 px-4 bg-white/20 text-white placeholder-gray-300 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <input
+              type="text"
+              placeholder="Name"
+              value={form.name}
+              onChange={handleChange('name')}
+              className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 text-gray-800 placeholder-gray-500 outline-none transition focus:border-[#4F30A9] focus:ring-4 focus:ring-[#4F30A9]/20"
+            />
+          </div>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange('email')}
-            className="w-full py-2 px-4 bg-white/20 text-white placeholder-gray-300 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+          <div>
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={handleChange('email')}
+              className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 text-gray-800 placeholder-gray-500 outline-none transition focus:border-[#4F30A9] focus:ring-4 focus:ring-[#4F30A9]/20"
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange('password')}
-            className="w-full py-2 px-4 bg-white/20 text-white placeholder-gray-300 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange('password')}
+              className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 pr-12 text-gray-800 placeholder-gray-500 outline-none transition-all duration-300 focus:border-[#4F30A9] focus:ring-4 focus:ring-[#4F30A9]/20"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-y-0 cursor-pointer right-4 flex items-center text-gray-500 transition-colors duration-300 hover:text-[#4F30A9]"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+            </button>
+          </div>
 
           {error && (
-            <p className="text-sm text-red-300 bg-red-500/20 rounded px-2 py-1">
+            <div className="rounded-xl bg-red-500/20 border border-red-400/30 px-4 py-3 text-sm text-red-100">
               {error}
-            </p>
+            </div>
           )}
 
           <button
             type="submit"
-            className="w-full py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-300 transition-colors disabled:opacity-50"
             disabled={submitting}
+            className="w-full rounded-xl bg-[#4F30A9] cursor-pointer py-3 font-semibold text-white shadow-lg transition hover:bg-[#3d01d2] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {submitting ? 'Creating account...' : 'REGISTER'}
+            {submitting ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
 
-        <div className="w-full bg-white mt-6" style={{ height: '1px' }}></div>
+        <div className="my-6 flex items-center">
+          <div className="h-px flex-1 bg-white/20"></div>
 
-        <div className="mt-2 mb-4 text-center text-white">Register As</div>
+          <span className="px-4 text-sm text-white/80">OR CONTINUE WITH</span>
+
+          <div className="h-px flex-1 bg-white/20"></div>
+        </div>
 
         <button
           onClick={handleGoogleSignUp}
-          className="w-full py-2 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-300 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           disabled={submitting}
+          className="flex w-full items-center justify-center gap-3 rounded-xl bg-white cursor-pointer py-3 font-semibold text-[#4F30A9] shadow-lg transition hover:bg-gray-100 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
+          <svg className="h-5 w-5" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -176,16 +198,17 @@ export const Signup = () => {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
+
           {submitting ? 'Creating account...' : 'Sign up with Google'}
         </button>
 
-        <p className="text-center text-gray-300 mt-6">
+        <p className="mt-8 text-center text-white/80">
           Already have an account?{' '}
           <Link
             to="/signin"
-            className="text-purple-400 hover:underline font-medium"
+            className="font-semibold text-white underline decoration-[#4F30A9] underline-offset-4 hover:text-[#d8ccff]"
           >
-            LOGIN
+            Sign In
           </Link>
         </p>
       </div>

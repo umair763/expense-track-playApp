@@ -25,10 +25,10 @@ export const Navbar = () => {
             <img
               src={user.photoURL}
               alt={user.userName}
-              className="h-9 w-9 rounded-xl border-2 border-purple-500 object-cover"
+              className="h-9 w-9 rounded-xl border-2 border-[#4F30A9] object-cover"
             />
           ) : (
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600 text-sm font-semibold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#4F30A9] text-sm font-semibold text-white">
               {initials}
             </div>
           )}

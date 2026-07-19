@@ -99,7 +99,7 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-[1050] p-4">
       <div className="bg-white rounded-xl overflow-hidden flex flex-col w-full max-w-[800px] max-h-[90vh] font-sans">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#4A02F9] rounded-t-xl flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#4F30A9] rounded-t-xl flex-shrink-0">
           <h2 className="text-[15px] font-semibold text-white leading-[1.4] m-0">
             Add Income
           </h2>
@@ -108,9 +108,18 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
             onClick={onClose}
             className="inline-flex items-center justify-center w-7 h-7 p-0 border-none bg-transparent text-white/85 cursor-pointer rounded-lg transition-all hover:bg-white/15 hover:text-white focus-visible:outline-2 focus-visible:outline-white/70 focus-visible:outline-offset-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              width="14"
+              height="14"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
@@ -131,18 +140,24 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
                 </label>
                 <div className="w-full">
                   <select
-                    className="w-full min-h-[44px] px-[14px] text-sm font-sans text-[#2A3547] bg-white border border-[#E4E7EC] rounded-lg outline-none cursor-pointer transition-all focus:border-[#4A02F9] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%236B7280%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-9"
+                    className="w-full min-h-[44px] px-[14px] text-sm font-sans text-[#2A3547] bg-white border border-[#E4E7EC] rounded-lg outline-none cursor-pointer transition-all focus:border-[#4F30A9] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%236B7280%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-9"
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                   >
                     <option value="">Select Category</option>
                     {categories.map((category) => (
-                      <option key={category} value={category}>{category}</option>
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                 </div>
                 {errors.category && (
-                  <span className="text-xs text-red-500 mt-[-4px]">{errors.category}</span>
+                  <span className="text-xs text-red-500 mt-[-4px]">
+                    {errors.category}
+                  </span>
                 )}
               </div>
 
@@ -153,12 +168,16 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
                 <input
                   type="number"
                   placeholder="Enter amount"
-                  className={`w-full border rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4A02F9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)] ${errors.amount ? 'border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]' : 'border-[#e2e8f0]'}`}
+                  className={`w-full border rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4F30A9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)] ${errors.amount ? 'border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]' : 'border-[#e2e8f0]'}`}
                   value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, amount: e.target.value })
+                  }
                 />
                 {errors.amount && (
-                  <span className="text-xs text-red-500 mt-[-4px]">{errors.amount}</span>
+                  <span className="text-xs text-red-500 mt-[-4px]">
+                    {errors.amount}
+                  </span>
                 )}
               </div>
             </div>
@@ -170,9 +189,11 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
               <textarea
                 placeholder="Enter description"
                 rows="2"
-                className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4A02F9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)] resize-vertical min-h-[64px] font-medium"
+                className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4F30A9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)] resize-vertical min-h-[64px] font-medium"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
               />
             </div>
 
@@ -183,9 +204,11 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
                 </label>
                 <input
                   type="date"
-                  className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4A02F9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)]"
+                  className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4F30A9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)]"
                   value={formData.incomeDate}
-                  onChange={(e) => setFormData({ ...formData, incomeDate: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, incomeDate: e.target.value })
+                  }
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -194,9 +217,11 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
                 </label>
                 <input
                   type="time"
-                  className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4A02F9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)]"
+                  className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#4F30A9] focus:shadow-[0_0_0_3px_rgba(74,2,249,0.1)]"
                   value={formData.incomeTime}
-                  onChange={(e) => setFormData({ ...formData, incomeTime: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, incomeTime: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -209,12 +234,14 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
                 <select
                   className="w-full min-h-[44px] px-[14px] text-sm font-sans text-[#2A3547] bg-white border border-[#E4E7EC] rounded-lg outline-none cursor-pointer transition-all focus:border-[#22C55E] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%236B7280%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-9"
                   value={formData.paymentMethod}
-                  onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, paymentMethod: e.target.value })
+                  }
                 >
-                    <option value="cash">Cash</option>
-                    <option value="online">Online</option>
-                    <option value="bank">Bank Transfer</option>
-                    <option value="card">Credit/Debit Card</option>
+                  <option value="cash">Cash</option>
+                  <option value="online">Online</option>
+                  <option value="bank">Bank Transfer</option>
+                  <option value="card">Credit/Debit Card</option>
                 </select>
               </div>
             </div>
@@ -237,7 +264,7 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#4A02F9] cursor-pointer transition-all hover:bg-[#4A02F9]/90 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center h-10 min-w-[90px] px-5 rounded-lg font-sans text-sm font-medium text-white border-none bg-[#4F30A9] cursor-pointer transition-all hover:bg-[#4F30A9]/90 disabled:opacity-70 disabled:cursor-not-allowed"
             disabled={loading}
           >
             {loading ? 'Submitting...' : 'Submit'}
