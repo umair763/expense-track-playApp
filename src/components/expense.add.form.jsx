@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../common/use.auth.jsx'
 import { createExpense } from '../firebase/firestore.service.js'
 import { toast } from 'react-toastify'
@@ -74,6 +74,20 @@ export const ExpenseAddForm = ({ open, onClose, onSuccess }) => {
   })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        category: '',
+        item: '',
+        amount: '',
+        expenseDate: new Date().toISOString().split('T')[0],
+        paymentMethod: 'cash',
+      })
+      setErrors({})
+    }
+  }, [open])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

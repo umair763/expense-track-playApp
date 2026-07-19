@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
 import {
   LayoutDashboard,
   Wallet,
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useSidebar } from '../common/sidebar.context'
 import { useAuth } from '../common'
+import { LogoutDialogue } from '../components/logout.dialogue'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -24,6 +26,7 @@ export const Sidebar = () => {
   const { collapsed, toggle, isMobileOpen, openMobile, closeMobile } =
     useSidebar()
   const { signout } = useAuth()
+  const [showLogoutDialogue, setShowLogoutDialogue] = useState(false)
 
   const sidebarWidth = collapsed ? 'w-16' : 'w-64'
   const desktopTranslate = 'lg:translate-x-0'
@@ -31,6 +34,19 @@ export const Sidebar = () => {
   const labelHidden = collapsed
     ? 'lg:opacity-0 lg:w-0 lg:overflow-hidden'
     : 'opacity-100'
+
+  const handleLogoutClick = () => {
+    setShowLogoutDialogue(true)
+  }
+
+  const handleLogoutConfirm = () => {
+    setShowLogoutDialogue(false)
+    signout()
+  }
+
+  const handleLogoutCancel = () => {
+    setShowLogoutDialogue(false)
+  }
 
   return (
     <>
@@ -124,7 +140,7 @@ export const Sidebar = () => {
           <div className="my-3 h-px w-full bg-gray-500/50" />
           <button
             type="button"
-            onClick={signout}
+            onClick={handleLogoutClick}
             className={`${linkBase} w-full cursor-pointer text-red-400 hover:bg-red-500/10 hover:text-red-300`}
             title={collapsed ? 'Sign out' : undefined}
           >
@@ -136,6 +152,12 @@ export const Sidebar = () => {
           </button>
         </div>
       </aside>
+
+      <LogoutDialogue
+        open={showLogoutDialogue}
+        onClose={handleLogoutCancel}
+        onLogout={handleLogoutConfirm}
+      />
     </>
   )
 }

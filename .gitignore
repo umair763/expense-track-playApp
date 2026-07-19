@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Optional npm cache directory
+expense-track-playapp-firebase-adminsdk-fbsvc-15ad479f7e.json 
+Daily Expenses - Sheet1.csv
+import-expenses.js

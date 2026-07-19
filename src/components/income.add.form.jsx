@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../common/use.auth.jsx'
 import { createIncome } from '../firebase/firestore.service.js'
 import { toast } from 'react-toastify'
@@ -32,6 +32,21 @@ export const IncomeAddForm = ({ open, onClose, onSuccess }) => {
   })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        category: '',
+        amount: '',
+        description: '',
+        incomeDate: new Date().toISOString().split('T')[0],
+        incomeTime: new Date().toTimeString().slice(0, 5),
+        paymentMethod: 'bank',
+      })
+      setErrors({})
+    }
+  }, [open])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

@@ -36,6 +36,7 @@ export const router = createBrowserRouter([
       { path: 'expenses', element: <Expenses /> },
       { path: 'incomes', element: <Incomes /> },
       { path: 'settings', element: <Settings /> },
+      
     ],
   },
   {
