@@ -69,6 +69,7 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
     category: '',
     item: '',
     amount: '',
+    description: '',
     expenseDate: new Date().toISOString().split('T')[0],
     paymentMethod: 'cash',
   })
@@ -81,6 +82,7 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
         category: expense.category?.name || '',
         item: expense.title || '',
         amount: expense.amount || '',
+        description: expense.description || '',
         expenseDate: expense.expenseDate
           ? new Date(
               expense.expenseDate.seconds ? expense.expenseDate.seconds * 1000 : expense.expenseDate
@@ -115,7 +117,7 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
 
     const expenseData = {
       title: formData.item,
-      description: `${formData.category} - ${formData.item}`,
+      description: formData.description || `${formData.category} - ${formData.item}`,
       amount: Number(formData.amount),
       currency: user.currency || 'PKR',
       category: {
@@ -229,6 +231,19 @@ export const ExpenseEditForm = ({ open, onClose, expense, onSuccess }) => {
               {errors.amount && (
                 <span className="text-xs text-red-500 mt-[-4px]">{errors.amount}</span>
               )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[13.5px] font-medium text-[#09090B] leading-none">
+                Description
+              </label>
+              <textarea
+                placeholder="Enter description (optional)"
+                rows="2"
+                className="w-full border border-[#e2e8f0] rounded-lg px-[14px] py-[10px] text-sm font-sans text-[#2A3547] bg-white outline-none transition-all focus:border-[#3B82F6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] resize-vertical min-h-[64px]"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">

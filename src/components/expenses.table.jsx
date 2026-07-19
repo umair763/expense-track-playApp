@@ -8,6 +8,7 @@ import { UiLoading } from '../common/ui.loading.jsx'
 import { UiStatusPill } from '../common/ui.status.phill.jsx'
 import { UiDelete } from '../common/ui.delete.jsx'
 import { ExpenseEditForm } from './expense.edit.form.jsx'
+import { ExpenseViewForm } from './expense.view.form.jsx'
 
 export const ExpensesTable = () => {
   const { user } = useAuth()
@@ -18,6 +19,7 @@ export const ExpensesTable = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [deleteModal, setDeleteModal] = useState({ open: false, item: null })
   const [editModal, setEditModal] = useState({ open: false, item: null })
+  const [viewModal, setViewModal] = useState({ open: false, item: null })
 
   useEffect(() => {
     fetchExpenses()
@@ -57,6 +59,10 @@ export const ExpensesTable = () => {
 
   const handleEdit = (expense) => {
     setEditModal({ open: true, item: expense })
+  }
+
+  const handleView = (expense) => {
+    setViewModal({ open: true, item: expense })
   }
 
   const confirmDelete = async () => {
@@ -210,9 +216,10 @@ export const ExpensesTable = () => {
 
                       <td className="px-6 py-4 text-right">
                         <ActionButtons
-                          showView={false}
+                          showView={true}
                           showEdit={true}
                           showDelete={true}
+                          onView={() => handleView(expense)}
                           onEdit={() => handleEdit(expense)}
                           onDelete={() => handleDelete(expense.id)}
                         />
@@ -257,6 +264,13 @@ export const ExpensesTable = () => {
           fetchExpenses()
           window.dispatchEvent(new CustomEvent('expenseAdded'))
         }}
+      />
+
+      {/* View Modal */}
+      <ExpenseViewForm
+        open={viewModal.open}
+        onClose={() => setViewModal({ open: false, item: null })}
+        expense={viewModal.item}
       />
     </div>
   )

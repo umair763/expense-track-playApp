@@ -8,3 +8,4 @@ export * from './expense.edit.form';
 export * from './income.edit.form';
 export * from '../common/ui.states';
 export * from './logout.dialogue';
+export * from './expense.view.form';
