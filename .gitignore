@@ -29,3 +29,8 @@ Daily Expenses - Sheet1.csv
 import-expenses.js
 expenses.json
 export-expenses.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
